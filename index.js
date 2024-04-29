@@ -40,6 +40,17 @@ async function run() {
         const result=await newCollection.insertOne(newItem)
         res.send(result);
       })
+      app.get("/newCraft",async(req,res)=>{
+        const cursor=newCollection.find();
+        const result=await cursor.toArray();
+        res.send(result);
+      })
+      app.put("/newCraft/:id",async(req,res)=>{
+        const id=req.params.id;
+        const updateuser=req.body;
+        console.log(updateuser);
+
+      })
       // manual data from database
       app.get("/crafts", async(req,res)=>{
  
