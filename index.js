@@ -32,7 +32,15 @@ async function run() {
      
       const database = client.db("potteryWeb");
       const craftCollection = database.collection("craftdata");
-  
+      const newCollection= database.collection("newcraftdata");
+
+      app.post("/newCraft",async(req,res)=>{
+        const newItem=req.body;
+        console.log(newItem);
+        const result=await newCollection.insertOne(newItem)
+        res.send(result);
+      })
+      // manual data from database
       app.get("/crafts", async(req,res)=>{
  
         const cursor=craftCollection.find();
