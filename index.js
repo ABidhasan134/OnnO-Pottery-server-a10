@@ -32,41 +32,54 @@ async function run() {
     const craftCollection = database.collection("craftdata");
     const newCollection = database.collection("newcraftdata");
 
+    app.get("/newCraft", async (req, res) => {
+      const cursor = newCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     app.post("/newCraft", async (req, res) => {
       const newItem = req.body;
       console.log(newItem);
       const result = await newCollection.insertOne(newItem);
       res.send(result);
     });
-    app.get("/newCraft", async (req, res) => {
-      const cursor = newCollection.find();
-      const result = await cursor.toArray();
-      res.send(result);
-    });
+
     app.put("/newCraft/:id", async (req, res) => {
       const id = req.params.id;
       const updatecraft = req.body;
       console.log(updatecraft);
-      const fillter = { id: new ObjectId(id) };
+      const filter = { id: new ObjectId(id) };
       const options = { upsert: true };
-      const updataDoc = {
+      const updateDoc = {
         $set: {
-          user_email: updatecraft.name,
-          user_name: updatecraft.email,
-          stock_status: updatecraft.stock,
-          processing_time: updatecraft.time,
+          email: updatecraft.name,
+
+          name: updatecraft.email,
+          stock: updatecraft.stock,
+          time: updatecraft.time,
           rating: updatecraft.rating,
+          price: updatecraft.price,
+          subcatagory: updatecraft.subcatagory,
+          ShortDiscription: updatecraft.ShortDiscription,
 
-          subcategory_name: updatecraft.subcatagory,
-          short_description: updatecraft.ShortDiscription,
-
-          image: updatecraft.imageurl,
-          item_name: updatecraft.itemname,
+          imageurl: updatecraft.imageurl,
+          itemname: updatecraft.itemname,
         },
       };
-      const result=await newCollection.updateOne(fillter,updataDoc,options);
+      const result = await newCollection.updateOne(filter, updateDoc, options);
+      console.log(result);
       res.send(result);
     });
+
+    app.delete("/newCraft/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log("deleted id from server", id);
+      const query = { _id: new ObjectId(id) };
+      const result = await newCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // manual data from database
     app.get("/crafts", async (req, res) => {
       const cursor = craftCollection.find();
