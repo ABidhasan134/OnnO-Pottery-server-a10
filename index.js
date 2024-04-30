@@ -61,7 +61,7 @@ async function run() {
       res.send(result);
     });
 
-    app.put("/newCraft/:id", async (req, res) => {
+    app.patch("/newCraft/:id", async (req, res) => {
       const id = req.params.id;
       const updatecraft = req.body;
       console.log(id,updatecraft);
@@ -83,7 +83,7 @@ async function run() {
           itemname: updatecraft.itemname,
         },
       };
-      const result = await newCollection.updateOne(filter, updateDoc, options);
+      const result = await newCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
 
