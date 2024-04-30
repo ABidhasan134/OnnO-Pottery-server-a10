@@ -32,12 +32,20 @@ async function run() {
     const craftCollection = database.collection("craftdata");
     const newCollection = database.collection("newcraftdata");
     const crafters=database.collection("ourartice");
+    const blogs=database.collection("blogs")
+
+    app.get("/blogs",async(req,res)=>{
+      const cursor = blogs.find();
+      const result = await cursor.toArray();
+      res.send(result);
+      // console.log(result);
+    })
 
     app.get("/artices",async(req,res)=>{
       const cursor = crafters.find();
       const result = await cursor.toArray();
       res.send(result);
-      console.log(result);
+      // console.log(result);
     })
 
     app.get("/newCraft", async (req, res) => {
@@ -48,7 +56,7 @@ async function run() {
 
     app.post("/newCraft", async (req, res) => {
       const newItem = req.body;
-      console.log(newItem);
+      // console.log(newItem);
       const result = await newCollection.insertOne(newItem);
       res.send(result);
     });
@@ -56,7 +64,7 @@ async function run() {
     app.put("/newCraft/:id", async (req, res) => {
       const id = req.params.id;
       const updatecraft = req.body;
-      console.log(updatecraft);
+      console.log(id,updatecraft);
       const filter = { id: new ObjectId(id) };
       const options = { upsert: true };
       const updateDoc = {
@@ -76,13 +84,12 @@ async function run() {
         },
       };
       const result = await newCollection.updateOne(filter, updateDoc, options);
-      console.log(result);
       res.send(result);
     });
 
     app.delete("/newCraft/:id", async (req, res) => {
       const id = req.params.id;
-      console.log("deleted id from server", id);
+      // console.log("deleted id from server", id);
       const query = { _id: new ObjectId(id) };
       const result = await newCollection.deleteOne(query);
       res.send(result);
