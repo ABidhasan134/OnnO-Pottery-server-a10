@@ -31,6 +31,14 @@ async function run() {
     const database = client.db("potteryWeb");
     const craftCollection = database.collection("craftdata");
     const newCollection = database.collection("newcraftdata");
+    const crafters=database.collection("ourartice");
+
+    app.get("/artices",async(req,res)=>{
+      const cursor = crafters.find();
+      const result = await cursor.toArray();
+      res.send(result);
+      console.log(result);
+    })
 
     app.get("/newCraft", async (req, res) => {
       const cursor = newCollection.find();
