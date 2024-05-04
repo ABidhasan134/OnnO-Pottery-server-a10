@@ -1,17 +1,21 @@
-// G6W48amYUcKS9Wcx
-// Potteryweb
-// OMic7lcw0efFrRd9
-// abeydhasan1
+
 const express = require("express");
+require("dotenv").config();
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-require("dotenv").config();
 // const uri = "mongodb+srv://abeydhasan134:OMic7lcw0efFrRd9@cluster0.il352b3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.USER_PASSWORD}.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-app.use(cors());
+const corsOptions ={
+  origin:["http://localhost:5173","https://our-pottery.web.app","http://localhost:5000"], 
+  credentials:true,
+  optionSuccessStatus:200,
+}
+
+app.use(cors(corsOptions))
+
 app.use(express.json());
 
 const client = new MongoClient(uri, {
@@ -30,7 +34,7 @@ async function run() {
   try {
     const database = client.db("potteryWeb");
     const craftCollection = database.collection("craftdata");
-    const newCollection = database.collection("newcraftdata");
+    
     const crafters=database.collection("ourartice");
     const blogs=database.collection("blogs")
 
@@ -48,60 +52,61 @@ async function run() {
       // console.log(result);
     })
 
-    app.get("/newCraft", async (req, res) => {
-      const cursor = newCollection.find();
-      const result = await cursor.toArray();
-      res.send(result);
-    });
-
-    app.post("/newCraft", async (req, res) => {
-      const newItem = req.body;
-      // console.log(newItem);
-      const result = await newCollection.insertOne(newItem);
-      res.send(result);
-    });
-
-    app.patch("/newCraft/:id", async (req, res) => {
-      const id = req.params.id;
-      const updatecraft = req.body;
-      console.log(id,updatecraft);
-      const filter = { id: new ObjectId(id) };
-      const options = { upsert: true };
-      const updateDoc = {
-        $set: {
-          email: updatecraft.name,
-
-          name: updatecraft.email,
-          stock: updatecraft.stock,
-          time: updatecraft.time,
-          rating: updatecraft.rating,
-          price: updatecraft.price,
-          subcatagory: updatecraft.subcatagory,
-          ShortDiscription: updatecraft.ShortDiscription,
-
-          imageurl: updatecraft.imageurl,
-          itemname: updatecraft.itemname,
-        },
-      };
-      const result = await newCollection.updateOne(filter, updateDoc);
-      res.send(result);
-    });
-
-    app.delete("/newCraft/:id", async (req, res) => {
-      const id = req.params.id;
-      // console.log("deleted id from server", id);
-      const query = { _id: new ObjectId(id) };
-      const result = await newCollection.deleteOne(query);
-      res.send(result);
-    });
-
     // manual data from database
     app.get("/crafts", async (req, res) => {
       const cursor = craftCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     });
+    app.post("/crafts", async (req, res) => {
+      const newItem = req.body;
+      const result = await craftCollection.insertOne(newItem);
+      res.send(result);
+    });
+    app.delete("/crafts/:id", async (req, res) => {
+      const id = req.params.id;
+      // console.log("deleted id from server", id);
+      const query = { _id: new ObjectId(id) };
+      const result = await craftCollection.deleteOne(query);
+      res.send(result);
+    });
 
+    app.put("/Crafts/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatecraft = req.body;
+      // console.log(updatecraft.image,
+      //   updatecraft.item_name,
+      //   updatecraft.subcategory_name,
+      //   updatecraft.short_description,
+      //   updatecraft.price,
+      //   updatecraft.rating,
+      //   updatecraft.customization,
+      //   updatecraft.processing_time,
+      //   updatecraft.stock_status,
+      //   updatecraft.user_email,
+      //   updatecraft.user_name,
+      // );
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          image: updatecraft.image,
+          item_name: updatecraft.item_name,
+          subcategory_name: updatecraft.subcategory_name,
+          short_description: updatecraft.short_description,
+          price: updatecraft.price,
+          rating: updatecraft.rating,
+          customization: updatecraft.customization,
+          processing_time: updatecraft.processing_time,
+          stock_status: updatecraft.stock_status,
+          user_email: updatecraft.user_email,
+          user_name: updatecraft.user_name,
+        },
+      };
+      
+      const result = await craftCollection.updateOne(filter, updateDoc,options);
+      res.send(result);
+    });
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
